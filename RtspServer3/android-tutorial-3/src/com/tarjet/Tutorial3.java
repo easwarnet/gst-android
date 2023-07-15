@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.tarjet.R;
 
+import org.freedesktop.gstreamer.GStreamer;
+
 public class Tutorial3 extends Activity implements SurfaceHolder.Callback {
     private native void nativeInit();     // Initialize native code, build pipeline, etc
     private native void nativeFinalize(); // Destroy pipeline and shutdown native code
@@ -120,7 +122,7 @@ public class Tutorial3 extends Activity implements SurfaceHolder.Callback {
 
     static {
         System.loadLibrary("gstreamer_android");
-        System.loadLibrary("tutorial-3");
+        System.loadLibrary("rtspclient");
         nativeClassInit();
     }
 

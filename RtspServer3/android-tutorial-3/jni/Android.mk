@@ -2,8 +2,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := tutorial-3
-LOCAL_SRC_FILES := tutorial-3.c dummy.cpp
+LOCAL_MODULE    := rtspclient
+LOCAL_SRC_FILES := rtspclient.cpp dummy.cpp
 LOCAL_SHARED_LIBRARIES := gstreamer_android
 LOCAL_LDLIBS := -llog -landroid
 include $(BUILD_SHARED_LIBRARY)
