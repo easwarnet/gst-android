@@ -11,11 +11,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tarjet.R;
-
 import org.freedesktop.gstreamer.GStreamer;
 
-public class Tutorial3 extends Activity implements SurfaceHolder.Callback {
+public class RtspClient extends Activity implements SurfaceHolder.Callback {
     private native void nativeInit();     // Initialize native code, build pipeline, etc
     private native void nativeFinalize(); // Destroy pipeline and shutdown native code
     private native void nativePlay();     // Set pipeline to PLAYING
@@ -42,7 +40,7 @@ public class Tutorial3 extends Activity implements SurfaceHolder.Callback {
             return;
         }
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.rtspclient);
 
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
@@ -52,7 +50,7 @@ public class Tutorial3 extends Activity implements SurfaceHolder.Callback {
             }
         });
 
-        ImageButton pause = (ImageButton) this.findViewById(R.id.button_stop);
+        ImageButton pause = this.findViewById(R.id.button_stop);
         pause.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 is_playing_desired = false;
@@ -60,7 +58,7 @@ public class Tutorial3 extends Activity implements SurfaceHolder.Callback {
             }
         });
 
-        SurfaceView sv = (SurfaceView) this.findViewById(R.id.surface_video);
+        SurfaceView sv = this.findViewById(R.id.surface_video);
         SurfaceHolder sh = sv.getHolder();
         sh.addCallback(this);
 
