@@ -1,8 +1,9 @@
 RtspServerTmp
 xReference
-RtspServer3/android-tutorial-3/build
-RtspServer3/android-tutorial-3/gst-build-arm64-v8a
-RtspServer3/android-tutorial-3/gst-build-armeabi-v7a
-RtspServer3/android-tutorial-3/gst-build-x86
-RtspServer3/android-tutorial-3/gst-build-x86_64
-RtspServer3/.gradle
+RtspServer3/RtspApp/build
+RtspServer3/RtspApp/gst-build-arm64-v8a
+RtspServer3/RtspApp/gst-build-armeabi-v7a
+RtspServer3/RtspApp/gst-build-x86
+RtspServer3/RtspApp/gst-build-x86_64
+RtspServer3/RtspApp/build/
+RtspServer3/.gradle/
