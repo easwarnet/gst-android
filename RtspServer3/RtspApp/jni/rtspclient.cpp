@@ -179,9 +179,9 @@ app_function (void *userdata)
   g_main_context_push_thread_default (data->context);
 
   /* Build pipeline */
-  data->pipeline =
-          gst_parse_launch ("videotestsrc ! warptv ! videoconvert ! autovideosink",
-                            &error);
+  //data->pipeline = gst_parse_launch ("videotestsrc ! warptv ! videoconvert ! autovideosink", &error);
+  //data->pipeline = gst_parse_launch ("rtspsrc location=rtsp://192.168.1.100:8554/test user-id=admin user-pw=password ! decodebin ! videoconvert ! xvimagesink", &error);
+  data->pipeline = gst_parse_launch ("uridecodebin uri=rtsp://192.168.1.100:8554/test ! decodebin ! videoconvert ! autovideosink", &error);
   if (error) {
     gchar *message =
             g_strdup_printf ("Unable to build pipeline: %s", error->message);
