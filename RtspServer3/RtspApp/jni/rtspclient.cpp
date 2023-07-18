@@ -391,7 +391,7 @@ JNI_OnLoad (JavaVM * vm, void *reserved)
                          "Could not retrieve JNIEnv");
     return 0;
   }
-  jclass klass = (env)->FindClass ("com/tarjet/RtspClient");
+  jclass klass = (env)->FindClass ("com/tarjet/rtspapp/RtspClient");
   (env)->RegisterNatives (klass, native_methods,
                           G_N_ELEMENTS (native_methods));
 

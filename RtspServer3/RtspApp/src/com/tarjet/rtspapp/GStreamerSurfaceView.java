@@ -1,4 +1,4 @@
-package com.tarjet;
+package com.tarjet.rtspapp;
 
 import android.content.Context;
 import android.util.AttributeSet;

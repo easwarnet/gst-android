@@ -36,7 +36,7 @@
             android:text="@string/button_stop" />
     </LinearLayout>
 
-    <com.tarjet.GStreamerSurfaceView
+    <com.tarjet.rtspapp.GStreamerSurfaceView
         android:id="@+id/surface_video"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

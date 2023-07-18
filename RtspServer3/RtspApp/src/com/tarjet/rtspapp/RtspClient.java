@@ -1,4 +1,4 @@
-package com.tarjet;
+package com.tarjet.rtspapp;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.tarjet.rtspapp.R;
 
 import org.freedesktop.gstreamer.GStreamer;
 

@@ -1,9 +1,11 @@
-package com.tarjet;
+package com.tarjet.rtspapp;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
+
+import com.tarjet.rtspapp.R;
 
 public class MainActivity extends AppCompatActivity {
     Button btRtspServer;
