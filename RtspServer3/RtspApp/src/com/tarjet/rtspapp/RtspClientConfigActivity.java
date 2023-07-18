@@ -18,6 +18,7 @@ public class RtspClientConfigActivity extends AppCompatActivity {
     Switch switchLogin;
     TextView tvUsername;
     TextView tvPassword;
+    boolean credentialsEnabled = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,24 +37,23 @@ public class RtspClientConfigActivity extends AppCompatActivity {
                 etvPassword.setVisibility(TextView.VISIBLE);
                 tvUsername.setVisibility(TextView.VISIBLE);
                 tvPassword.setVisibility(TextView.VISIBLE);
+                credentialsEnabled = true;
             } else {
                 etvUsername.setVisibility(TextView.GONE);
                 etvPassword.setVisibility(TextView.GONE);
                 tvUsername.setVisibility(TextView.GONE);
                 tvPassword.setVisibility(TextView.GONE);
+                credentialsEnabled = false;
             }
         });
 
         btStartRtspClient.setOnClickListener(view -> {
             Intent in = new Intent(RtspClientConfigActivity.this, RtspClient.class);
-            //Bundle extras = new Bundle();
-            //extras.putString("Uri", etvUri.getText().toString());
-            //extras.putString("Username", etvUri.getText().toString());
-            //extras.putString("Password", etvUri.getText().toString());
-            //Toast.makeText(this, etvUri.getText().toString(), Toast.LENGTH_SHORT).show();
             in.putExtra("Uri", etvUri.getText().toString());
-            in.putExtra("Username", etvUsername.getText().toString());
-            in.putExtra("Password", etvPassword.getText().toString());
+            if(credentialsEnabled) {
+                in.putExtra("Username", etvUsername.getText().toString());
+                in.putExtra("Password", etvPassword.getText().toString());
+            }
             startActivity(in);
         });
     }

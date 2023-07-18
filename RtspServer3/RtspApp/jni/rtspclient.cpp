@@ -183,15 +183,18 @@ static void *app_function(void *userdata) {
     bool test = true;*/
 
 
-
-    if (data->credentials == true) {
-        pipeline = g_strdup_printf(
-                "rtspsrc location=%s user-id=%s user-pw=%s ! decodebin ! videoconvert ! autovideosink",
-                data->uri.c_str(), data->username.c_str(), data->password.c_str());
+    if(data->uri.empty()) {
+        pipeline = g_strdup_printf("videotestsrc ! warptv ! videoconvert ! autovideosink");
     } else {
-        pipeline = g_strdup_printf(
-                "rtspsrc location=%s ! decodebin ! videoconvert ! autovideosink",
-                data->uri.c_str());
+        if (data->credentials == true) {
+            pipeline = g_strdup_printf(
+                    "rtspsrc location=%s user-id=%s user-pw=%s ! decodebin ! videoconvert ! autovideosink",
+                    data->uri.c_str(), data->username.c_str(), data->password.c_str());
+        } else {
+            pipeline = g_strdup_printf(
+                    "rtspsrc location=%s ! decodebin ! videoconvert ! autovideosink",
+                    data->uri.c_str());
+        }
     }
 
     GST_DEBUG (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>PIPELINE: %s", pipeline);
@@ -286,7 +289,7 @@ gst_native_init (JNIEnv * env, jobject thiz, jstring uri, jboolean credentials, 
 
     const char *char_password = env->GetStringUTFChars(password, NULL);
     data->password.assign(char_password);
-    GST_DEBUG ("Username Received %s", data->password.c_str());
+    GST_DEBUG ("Password Received %s", data->password.c_str());
     env->ReleaseStringUTFChars(password, char_password);
 
     data->credentials = (bool)credentials;

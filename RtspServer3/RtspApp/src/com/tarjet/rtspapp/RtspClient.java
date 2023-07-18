@@ -57,7 +57,7 @@ public class RtspClient extends Activity implements SurfaceHolder.Callback {
         if (in.hasExtra("Uri")) {
             uri = extras.getString("Uri");
         } else {
-            uri = "videotestsrc";
+            uri = "";
         }
         if (in.hasExtra("Username") && in.hasExtra("Password")) {
             username = extras.getString("Username");
