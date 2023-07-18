@@ -17,7 +17,8 @@ import com.tarjet.rtspapp.R;
 import org.freedesktop.gstreamer.GStreamer;
 
 public class RtspClient extends Activity implements SurfaceHolder.Callback {
-    private native void nativeInit();     // Initialize native code, build pipeline, etc
+    // Initialize native code, build pipeline, etc
+    private native void nativeInit(String uri, boolean credentialsEnabled, String username, String password);
     private native void nativeFinalize(); // Destroy pipeline and shutdown native code
     private native void nativePlay();     // Set pipeline to PLAYING
     private native void nativePause();    // Set pipeline to PAUSED
@@ -56,7 +57,7 @@ public class RtspClient extends Activity implements SurfaceHolder.Callback {
         if (in.hasExtra("Uri")) {
             uri = extras.getString("Uri");
         } else {
-            uri = "test";
+            uri = "videotestsrc";
         }
         if (in.hasExtra("Username") && in.hasExtra("Password")) {
             username = extras.getString("Username");
@@ -71,6 +72,7 @@ public class RtspClient extends Activity implements SurfaceHolder.Callback {
         play.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 is_playing_desired = true;
+                Toast.makeText(RtspClient.this, "Stream starting soon", Toast.LENGTH_SHORT).show();
                 nativePlay();
             }
         });
@@ -99,7 +101,7 @@ public class RtspClient extends Activity implements SurfaceHolder.Callback {
         this.findViewById(R.id.button_play).setEnabled(false);
         this.findViewById(R.id.button_stop).setEnabled(false);
 
-        nativeInit();
+        nativeInit(uri, credentialsEnabled, username, password);
     }
 
     protected void onSaveInstanceState (Bundle outState) {

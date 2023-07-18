@@ -1,3 +1,5 @@
+#include <iostream>
+#include <memory>
 #include <string.h>
 #include <stdint.h>
 #include <jni.h>
@@ -10,6 +12,7 @@
 
 GST_DEBUG_CATEGORY_STATIC (debug_category);
 #define GST_CAT_DEFAULT debug_category
+using namespace std;
 
 /*
  * These macros provide a way to store the native pointer to CustomData, which might be 32 or 64 bits, into
@@ -32,6 +35,10 @@ typedef struct _CustomData
     GMainLoop *main_loop;         /* GLib main loop */
     gboolean initialized;         /* To avoid informing the UI multiple times about the initialization */
     GstElement *video_sink;       /* The video sink element which receives XOverlay commands */
+    string uri;
+    bool credentials;
+    string username;
+    string password;
     ANativeWindow *native_window; /* The Android native window where video will be rendered */
 } CustomData;
 
@@ -163,75 +170,92 @@ check_initialization_complete (CustomData * data)
 }
 
 /* Main method for the native code. This is executed on its own thread. */
-static void *
-app_function (void *userdata)
-{
-  JavaVMAttachArgs args;
-  GstBus *bus;
-  CustomData *data = (CustomData *) userdata;
-  GSource *bus_source;
-  GError *error = NULL;
+static void *app_function(void *userdata) {
+    JavaVMAttachArgs args;
+    GstBus *bus;
+    CustomData *data = (CustomData *) userdata;
+    GSource *bus_source;
+    GError *error = NULL;
+    gchar *pipeline;
+    /*string uri = "rtsp://192.168.1.100:8554/test";
+    string username = "admin";
+    string password = "password";
+    bool test = true;*/
 
-  GST_DEBUG ("Creating pipeline in CustomData at %p", data);
 
-  /* Create our own GLib Main Context and make it the default one */
-  data->context = g_main_context_new ();
-  g_main_context_push_thread_default (data->context);
 
-  /* Build pipeline */
-  //data->pipeline = gst_parse_launch ("videotestsrc ! warptv ! videoconvert ! autovideosink", &error);
-  data->pipeline = gst_parse_launch ("rtspsrc location=rtsp://192.168.1.100:8554/test user-id=admin user-pw=password ! decodebin ! videoconvert ! autovideosink", &error);
-  //data->pipeline = gst_parse_launch ("uridecodebin uri=rtsp://192.168.1.100:8554/test ! decodebin ! videoconvert ! autovideosink", &error);
-  if (error) {
-    gchar *message =
-            g_strdup_printf ("Unable to build pipeline: %s", error->message);
-    g_clear_error (&error);
-    set_ui_message (message, data);
-    g_free (message);
+    if (data->credentials == true) {
+        pipeline = g_strdup_printf(
+                "rtspsrc location=%s user-id=%s user-pw=%s ! decodebin ! videoconvert ! autovideosink",
+                data->uri.c_str(), data->username.c_str(), data->password.c_str());
+    } else {
+        pipeline = g_strdup_printf(
+                "rtspsrc location=%s ! decodebin ! videoconvert ! autovideosink",
+                data->uri.c_str());
+    }
+
+    GST_DEBUG (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>PIPELINE: %s", pipeline);
+
+    GST_DEBUG ("Creating pipeline in CustomData at %p", data);
+
+    /* Create our own GLib Main Context and make it the default one */
+    data->context = g_main_context_new();
+    g_main_context_push_thread_default(data->context);
+
+    /* Build pipeline */
+    //data->pipeline = gst_parse_launch ("uridecodebin uri=rtsp://192.168.1.100:8554/test ! decodebin ! videoconvert ! autovideosink", &error);
+    //data->pipeline = gst_parse_launch ("videotestsrc ! warptv ! videoconvert ! autovideosink", &error);
+    //data->pipeline = gst_parse_launch ("rtspsrc location=rtsp://192.168.1.100:8554/test user-id=admin user-pw=password ! decodebin ! videoconvert ! autovideosink", &error);
+    data->pipeline = gst_parse_launch(pipeline, &error);
+    if (error) {
+        gchar *message = g_strdup_printf("Unable to build pipeline: %s", error->message);
+        g_clear_error(&error);
+        set_ui_message(message, data);
+        g_free(message);
+        return NULL;
+    }
+
+    /* Set the pipeline to READY, so it can already accept a window handle, if we have one */
+    gst_element_set_state(data->pipeline, GST_STATE_READY);
+
+    data->video_sink =
+            gst_bin_get_by_interface(GST_BIN (data->pipeline),
+                                     GST_TYPE_VIDEO_OVERLAY);
+    if (!data->video_sink) {
+        GST_ERROR ("Could not retrieve video sink");
+        return NULL;
+    }
+
+    /* Instruct the bus to emit signals for each received message, and connect to the interesting signals */
+    bus = gst_element_get_bus(data->pipeline);
+    bus_source = gst_bus_create_watch(bus);
+    g_source_set_callback(bus_source, (GSourceFunc) gst_bus_async_signal_func,
+                          NULL, NULL);
+    g_source_attach(bus_source, data->context);
+    g_source_unref(bus_source);
+    g_signal_connect (G_OBJECT(bus), "message::error", (GCallback) error_cb,
+                      data);
+    g_signal_connect (G_OBJECT(bus), "message::state-changed",
+                      (GCallback) state_changed_cb, data);
+    gst_object_unref(bus);
+
+    /* Create a GLib Main Loop and set it to run */
+    GST_DEBUG ("Entering main loop... (CustomData:%p)", data);
+    data->main_loop = g_main_loop_new(data->context, FALSE);
+    check_initialization_complete(data);
+    g_main_loop_run(data->main_loop);
+    GST_DEBUG ("Exited main loop");
+    g_main_loop_unref(data->main_loop);
+    data->main_loop = NULL;
+
+    /* Free resources */
+    g_main_context_pop_thread_default(data->context);
+    g_main_context_unref(data->context);
+    gst_element_set_state(data->pipeline, GST_STATE_NULL);
+    gst_object_unref(data->video_sink);
+    gst_object_unref(data->pipeline);
+
     return NULL;
-  }
-
-  /* Set the pipeline to READY, so it can already accept a window handle, if we have one */
-  gst_element_set_state (data->pipeline, GST_STATE_READY);
-
-  data->video_sink =
-          gst_bin_get_by_interface (GST_BIN (data->pipeline),
-                                    GST_TYPE_VIDEO_OVERLAY);
-  if (!data->video_sink) {
-    GST_ERROR ("Could not retrieve video sink");
-    return NULL;
-  }
-
-  /* Instruct the bus to emit signals for each received message, and connect to the interesting signals */
-  bus = gst_element_get_bus (data->pipeline);
-  bus_source = gst_bus_create_watch (bus);
-  g_source_set_callback (bus_source, (GSourceFunc) gst_bus_async_signal_func,
-                         NULL, NULL);
-  g_source_attach (bus_source, data->context);
-  g_source_unref (bus_source);
-  g_signal_connect (G_OBJECT (bus), "message::error", (GCallback) error_cb,
-                    data);
-  g_signal_connect (G_OBJECT (bus), "message::state-changed",
-                    (GCallback) state_changed_cb, data);
-  gst_object_unref (bus);
-
-  /* Create a GLib Main Loop and set it to run */
-  GST_DEBUG ("Entering main loop... (CustomData:%p)", data);
-  data->main_loop = g_main_loop_new (data->context, FALSE);
-  check_initialization_complete (data);
-  g_main_loop_run (data->main_loop);
-  GST_DEBUG ("Exited main loop");
-  g_main_loop_unref (data->main_loop);
-  data->main_loop = NULL;
-
-  /* Free resources */
-  g_main_context_pop_thread_default (data->context);
-  g_main_context_unref (data->context);
-  gst_element_set_state (data->pipeline, GST_STATE_NULL);
-  gst_object_unref (data->video_sink);
-  gst_object_unref (data->pipeline);
-
-  return NULL;
 }
 
 /*
@@ -240,17 +264,35 @@ app_function (void *userdata)
 
 /* Instruct the native code to create its internal data structure, pipeline and thread */
 static void
-gst_native_init (JNIEnv * env, jobject thiz)
+gst_native_init (JNIEnv * env, jobject thiz, jstring uri, jboolean credentials, jstring username, jstring password)
 {
-  CustomData *data = g_new0 (CustomData, 1);
-  SET_CUSTOM_DATA (thiz, custom_data_field_id, data);
-  GST_DEBUG_CATEGORY_INIT (debug_category, "rtspclient", 0,
-                           "Android tutorial 3");
-  gst_debug_set_threshold_for_name ("rtspclient", GST_LEVEL_DEBUG);
-  GST_DEBUG ("Created CustomData at %p", data);
-  data->app = (env)->NewGlobalRef (thiz);
-  GST_DEBUG ("Created GlobalRef for app object at %p", data->app);
-  pthread_create (&gst_app_thread, NULL, &app_function, data);
+    CustomData *data = g_new0 (CustomData, 1);
+    SET_CUSTOM_DATA (thiz, custom_data_field_id, data);
+    GST_DEBUG_CATEGORY_INIT (debug_category, "rtspclient", 0,
+                             "Android tutorial 3");
+    gst_debug_set_threshold_for_name("rtspclient", GST_LEVEL_DEBUG);
+    GST_DEBUG ("Created CustomData at %p", data);
+    data->app = (env)->NewGlobalRef(thiz);
+
+    const char *char_uri = env->GetStringUTFChars(uri, NULL);
+    data->uri.assign(char_uri);
+    GST_DEBUG ("URI Received %s", data->uri.c_str());
+    env->ReleaseStringUTFChars(uri, char_uri);
+
+    const char *char_username = env->GetStringUTFChars(username, NULL);
+    data->username.assign(char_username);
+    GST_DEBUG ("Username Received %s", data->username.c_str());
+    env->ReleaseStringUTFChars(username, char_username);
+
+    const char *char_password = env->GetStringUTFChars(password, NULL);
+    data->password.assign(char_password);
+    GST_DEBUG ("Username Received %s", data->password.c_str());
+    env->ReleaseStringUTFChars(password, char_password);
+
+    data->credentials = (bool)credentials;
+
+    GST_DEBUG ("Created GlobalRef for app object at %p", data->app);
+    pthread_create(&gst_app_thread, NULL, &app_function, data);
 }
 
 /* Quit the main loop, remove the native thread and free resources */
@@ -368,7 +410,8 @@ gst_native_surface_finalize (JNIEnv * env, jobject thiz)
 
 /* List of implemented native methods */
 static JNINativeMethod native_methods[] = {
-        {"nativeInit", "()V", (void *) gst_native_init},
+        //{"nativeInit", "()V", (void *) gst_native_init},
+        {"nativeInit", "(Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V", (void *) gst_native_init},
         {"nativeFinalize", "()V", (void *) gst_native_finalize},
         {"nativePlay", "()V", (void *) gst_native_play},
         {"nativePause", "()V", (void *) gst_native_pause},
