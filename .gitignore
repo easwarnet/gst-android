@@ -1,3 +1,4 @@
+.gitignore
 RtspServerTmp
 xReference
 RtspServer3/RtspApp/build
@@ -7,3 +8,5 @@ RtspServer3/RtspApp/gst-build-x86
 RtspServer3/RtspApp/gst-build-x86_64
 RtspServer3/RtspApp/build/
 RtspServer3/.gradle/
+RtspServer3/java_pid*
+RtspServer3/.idea/

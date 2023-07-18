@@ -36,7 +36,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:text="Username:"
-        android:visibility="gone"
+        android:visibility="visible"
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@+id/etvUsername"
         app:layout_constraintHorizontal_bias="0.0"
@@ -51,7 +51,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="Password:"
-        android:visibility="gone"
+        android:visibility="visible"
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@+id/etvPassword"
         app:layout_constraintHorizontal_bias="0.0"
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
-        android:checked="false"
+        android:checked="true"
         android:text="Login Credentials"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -90,9 +90,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:visibility="gone"
         android:inputType="textPersonName"
-        android:text="Username"
+        android:text="admin"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
 
     <EditText
@@ -101,8 +101,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:visibility="gone"
-        android:inputType="textPassword"
+        android:inputType="textShortMessage"
+        android:text="password"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/tvPassword"
         tools:layout_editor_absoluteX="162dp" />
 
@@ -114,6 +115,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etvPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etvUri"
+        app:layout_constraintVertical_bias="0.673"
+        tools:layout_editor_absoluteX="0dp" />
 
 </android.support.constraint.ConstraintLayout>

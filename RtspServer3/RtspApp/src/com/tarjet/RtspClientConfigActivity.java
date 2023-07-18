@@ -5,10 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RtspClientConfigActivity extends AppCompatActivity {
     Button btStartRtspClient;
@@ -45,9 +45,15 @@ public class RtspClientConfigActivity extends AppCompatActivity {
         });
 
         btStartRtspClient.setOnClickListener(view -> {
-            Intent in = new Intent(getApplicationContext(), RtspClient.class);
-            Bundle extras = new Bundle();
-            extras.putString("URI", "");
+            Intent in = new Intent(RtspClientConfigActivity.this, RtspClient.class);
+            //Bundle extras = new Bundle();
+            //extras.putString("Uri", etvUri.getText().toString());
+            //extras.putString("Username", etvUri.getText().toString());
+            //extras.putString("Password", etvUri.getText().toString());
+            //Toast.makeText(this, etvUri.getText().toString(), Toast.LENGTH_SHORT).show();
+            in.putExtra("Uri", etvUri.getText().toString());
+            in.putExtra("Username", etvUsername.getText().toString());
+            in.putExtra("Password", etvPassword.getText().toString());
             startActivity(in);
         });
     }

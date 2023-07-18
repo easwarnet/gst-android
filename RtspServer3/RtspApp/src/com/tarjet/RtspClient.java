@@ -1,6 +1,7 @@
 package com.tarjet;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -23,6 +24,12 @@ public class RtspClient extends Activity implements SurfaceHolder.Callback {
     private native void nativeSurfaceFinalize();
     private long native_custom_data;      // Native code will use this to keep private data
 
+    final String LOG_TAG = this.getClass().getSimpleName();
+    String uri = "";
+    String username = "";
+    String password = "";
+    boolean credentialsEnabled = false;
+
     private boolean is_playing_desired;   // Whether the user asked to go to PLAYING
 
     // Called when the activity is first created.
@@ -41,6 +48,22 @@ public class RtspClient extends Activity implements SurfaceHolder.Callback {
         }
 
         setContentView(R.layout.rtspclient);
+
+        Intent in = getIntent();
+        Bundle extras = in.getExtras();
+        if (in.hasExtra("Uri")) {
+            uri = extras.getString("Uri");
+        } else {
+            uri = "test";
+        }
+        if (in.hasExtra("Username") && in.hasExtra("Password")) {
+            username = extras.getString("Username");
+            password = extras.getString("Password");
+            credentialsEnabled = true;
+        } else {
+            credentialsEnabled = false;
+        }
+
 
         ImageButton play = (ImageButton) this.findViewById(R.id.button_play);
         play.setOnClickListener(new OnClickListener() {
