@@ -125,8 +125,7 @@ static void state_changed_cb (GstBus * bus, GstMessage * msg, CustomData * data)
     gst_message_parse_state_changed(msg, &old_state, &new_state, &pending_state);
     /* Only pay attention to messages coming from the pipeline, not its children */
     if (GST_MESSAGE_SRC (msg) == GST_OBJECT (data->pipeline)) {
-        gchar *message = g_strdup_printf("State changed to %s",
-                                         gst_element_state_get_name(new_state));
+        gchar *message = g_strdup_printf("State changed to %s", gst_element_state_get_name(new_state));
         set_ui_message(message, data);
         g_free(message);
     }
@@ -184,9 +183,12 @@ static void *app_function(void *userdata) {
     g_main_context_push_thread_default(data->context);
 
     /* Build pipeline */
-    //data->pipeline = gst_parse_launch ("uridecodebin uri=rtsp://192.168.1.100:8554/test ! decodebin ! videoconvert ! autovideosink", &error);
+    //data->pipeline = gst_parse_launch ("uridecodebin uri=rtsp://192.168.1.100:8554/test !
+    //                                    decodebin ! videoconvert ! autovideosink", &error);
     //data->pipeline = gst_parse_launch ("videotestsrc ! warptv ! videoconvert ! autovideosink", &error);
-    //data->pipeline = gst_parse_launch ("rtspsrc location=rtsp://192.168.1.100:8554/test user-id=admin user-pw=password ! decodebin ! videoconvert ! autovideosink", &error);
+    //data->pipeline = gst_parse_launch ("rtspsrc location=rtsp://192.168.1.100:8554/test
+    //                                    user-id=admin user-pw=password ! decodebin ! videoconvert
+    //                                    ! autovideosink", &error);
     data->pipeline = gst_parse_launch(pipeline, &error);
     if (error) {
         gchar *message = g_strdup_printf("Unable to build pipeline: %s", error->message);
@@ -331,8 +333,7 @@ static void gst_native_surface_init (JNIEnv * env, jobject thiz, jobject surface
     if (data->native_window) {
         ANativeWindow_release(data->native_window);
         if (data->native_window == new_native_window) {
-            GST_DEBUG ("New native window is the same as the previous one %p",
-                       data->native_window);
+            GST_DEBUG ("New native window is the same as the previous one %p", data->native_window);
             if (data->video_sink) {
                 gst_video_overlay_expose(GST_VIDEO_OVERLAY (data->video_sink));
                 gst_video_overlay_expose(GST_VIDEO_OVERLAY (data->video_sink));
