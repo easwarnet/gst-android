@@ -22,18 +22,15 @@ public class RtspServer extends AppCompatActivity {
     private long native_custom_data;      // Native code will use this to keep private data
     Button btStartRtspServer;
     Button btStopRtspServer;
-    TextView tvRtspServerStatus = findViewById(R.id.tvRtspServerStatus);
-    static {
-        System.loadLibrary("gstreamer_android");
-        System.loadLibrary("rtspserver");
-        nativeClassInit();
-    }
+    TextView tvRtspServerStatus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rtsp_server);
         btStartRtspServer = findViewById(R.id.btStartRtspServer);
         btStopRtspServer = findViewById(R.id.btStopRtspServer);
+        tvRtspServerStatus = findViewById(R.id.tvRtspServerStatus);
 
         btStartRtspServer.setOnClickListener(view -> {
             Toast.makeText(this, "IP Address: " + getIpAddress(), Toast.LENGTH_SHORT).show();
@@ -55,7 +52,7 @@ public class RtspServer extends AppCompatActivity {
     // Called from native code. Native code calls this once it has created its pipeline and
     // the main loop is running, so it is ready to accept commands.
     private void onGStreamerInitialized () {
-        tvRtspServerStatus.setText("GStreamer Initialized");
+        //tvRtspServerStatus.setText("GStreamer Initialized");
     }
 
     private String getIpAddress() {
@@ -86,6 +83,12 @@ public class RtspServer extends AppCompatActivity {
         }
 
         return ip;
+    }
+
+    static {
+        System.loadLibrary("gstreamer_android");
+        System.loadLibrary("rtspserver");
+        nativeClassInit();
     }
 
 }
