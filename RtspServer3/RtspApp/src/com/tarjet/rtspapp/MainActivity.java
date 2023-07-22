@@ -17,6 +17,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         btRtspServer = findViewById(R.id.btRtspServer);
         btRtspClient = findViewById(R.id.btRtspClient);
+        btRtspServer.setOnClickListener(view -> {
+            Intent in = new Intent(getApplicationContext(), RtspServer.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(in);
+        });
         btRtspClient.setOnClickListener(view -> {
             Intent in = new Intent(getApplicationContext(), RtspClientConfigActivity.class);
             in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

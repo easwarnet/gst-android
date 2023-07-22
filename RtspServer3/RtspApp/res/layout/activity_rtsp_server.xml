@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RtspServer">
+
+    <Button
+        android:id="@+id/btStartRtspServer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:text="Start Rtsp Client"
+        app:layout_constraintBottom_toTopOf="@+id/tvRtspServerStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btStopRtspServer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="Stop Rtsp Client"
+        app:layout_constraintBottom_toTopOf="@+id/tvRtspServerStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvRtspServerStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="144dp"
+        android:text="Status"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="96dp" />
+
+    <TextView
+        android:id="@+id/tvServerUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:text="Username:"
+        android:textSize="24sp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/etvServerUsername"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
+
+    <TextView
+        android:id="@+id/tvServerPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="Password:"
+        android:visibility="visible"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/etvServerPassword"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etvServerUsername" />
+
+
+    <Switch
+        android:id="@+id/switchLoginServer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:checked="true"
+        android:text="Enable Credentials"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvRtspServerStatus" />
+
+    <EditText
+        android:id="@+id/etvServerUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="admin"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/tvServerUsername" />
+
+    <EditText
+        android:id="@+id/etvServerPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="textShortMessage"
+        android:text="password"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/tvServerPassword"
+        tools:layout_editor_absoluteX="162dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="24dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintTop_toBottomOf="@+id/switchLoginServer"
+        tools:layout_editor_absoluteX="-16dp" />
+
+</android.support.constraint.ConstraintLayout>

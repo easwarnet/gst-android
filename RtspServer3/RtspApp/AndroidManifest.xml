@@ -15,6 +15,10 @@
         android:icon="@drawable/gstreamer_logo_3"
         android:label="@string/app_name">
         <activity
+            android:name=".RtspServer"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light" />
+        <activity
             android:name=".RtspClientConfigActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light" />
@@ -22,7 +26,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,9 +35,7 @@
         <activity
             android:name=".RtspClient"
             android:exported="true"
-            android:label="@string/app_name">
-
-        </activity>
+            android:label="@string/app_name"></activity>
     </application>
 
 </manifest>
