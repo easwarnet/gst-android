@@ -91,7 +91,10 @@ static JNIEnv *get_jni_env (void) {
     return env;
 }
 static void *app_function(void *userdata) {
-    string pipeline = " ( videotestsrc ! videoconvert ! x264enc ! rtph264pay name=pay0 pt=96 ) ";
+    string pipeline1 = " ( videotestsrc ! videoconvert ! x264enc ! rtph264pay name=pay0 pt=96 ) ";
+    string pipeline = " ( ahcsrc ! videoscale ! "
+                      "capsfilter caps=video/x-raw ! videoconvert ! " //clockoverlay ! "
+                      "queue ! x264enc ! rtph264pay name=pay0 pt=96 ) ";
     rtspServer = new RtspServer(pipeline);
     rtspServer->RtspServerInit(true, "/test", port);
     rtspServer->RtspStart();
