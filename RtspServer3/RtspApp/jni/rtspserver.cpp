@@ -2,13 +2,15 @@
 #include <iostream>
 #include <memory>
 #include "rtspserver.h"
-
+#include "androidlogger.h"
 
 gboolean RtspServer::SignalHandler(gpointer user_data) {
     GMainLoop *loop = (GMainLoop *) user_data;
-    cout << "RtspServer: Stopping" << endl;
+    LOGV(LOGTAG, "RtspServer: Stopping");
+    //cout << "RtspServer: Stopping" << endl;
 
     //g_print("closing the main loop");
+    LOGV(LOGTAG, "Closing the main loop");
     g_main_loop_quit(loop);
 
     return TRUE;
@@ -23,7 +25,8 @@ gboolean RtspServer::RemoveFunc(GstRTSPSessionPool *pool,
 gboolean RtspServer::RemoveSessions(GstRTSPServer * server) {
     GstRTSPSessionPool *pool;
 
-    g_print("RtspServer: Removing all sessions\n");
+    //g_print("RtspServer: Removing all sessions\n");
+    LOGV(LOGTAG, "RtspServer: Removing all sessions");
     pool = gst_rtsp_server_get_session_pool(server);
     gst_rtsp_session_pool_filter(pool,
                                  (GstRTSPSessionPoolFilterFunc) RemoveFunc, server);
@@ -34,7 +37,8 @@ gboolean RtspServer::RemoveSessions(GstRTSPServer * server) {
 
 gboolean RtspServer::PoolCleanup(GstRTSPServer * server) {
     GstRTSPSessionPool *pool;
-    g_print("RtspServer: Pool Cleanup\n");
+    //g_print("RtspServer: Pool Cleanup\n");
+    LOGV(LOGTAG, "RtspServer: Pool Cleanup");
     pool = gst_rtsp_server_get_session_pool(server);
     gst_rtsp_session_pool_cleanup(pool);
     g_object_unref(pool);
@@ -46,14 +50,16 @@ gboolean RtspServer::PoolCleanup(GstRTSPServer * server) {
 void RtspServer::OnSsrcActive(GObject * session, GObject * source, GstRTSPMedia * media) {
     GstStructure *stats;
 
-    GST_INFO("source %p in session %p is active", source, session);
+    //GST_INFO("source %p in session %p is active", source, session);
+    LOGV(LOGTAG, "source %p in session %p is active", source, session);
 
     g_object_get(source, "stats", &stats, NULL);
     if(stats) {
         gchar *sstr;
 
         sstr = gst_structure_to_string(stats);
-        g_print("structure: %s\n", sstr);
+        //g_print("structure: %s\n", sstr);
+        LOGV(LOGTAG, "structure: %s\n", sstr);
         g_free(sstr);
 
         gst_structure_free(stats);
@@ -63,14 +69,16 @@ void RtspServer::OnSsrcActive(GObject * session, GObject * source, GstRTSPMedia 
 void RtspServer::OnSenderSsrcActive(GObject * session, GObject * source, GstRTSPMedia * media) {
     GstStructure *stats;
 
-    GST_INFO("source %p in session %p is active", source, session);
+    //GST_INFO("source %p in session %p is active", source, session);
+    LOGD(LOGTAG, "source %p in session %p is active", source, session);
 
     g_object_get(source, "stats", &stats, NULL);
     if(stats) {
         gchar *sstr;
 
         sstr = gst_structure_to_string(stats);
-        g_print("Sender stats:\nstructure: %s\n", sstr);
+        //g_print("Sender stats:\nstructure: %s\n", sstr);
+        LOGV(LOGTAG, "Sender stats:\nstructure: %s\n", sstr);
         g_free(sstr);
 
         gst_structure_free(stats);
@@ -84,7 +92,8 @@ void RtspServer::MediaPreparedCb(GstRTSPMedia * media) {
 
     n_streams = gst_rtsp_media_n_streams(media);
 
-    GST_INFO("media %p is prepared and has %u streams", media, n_streams);
+    //GST_INFO("media %p is prepared and has %u streams", media, n_streams);
+    LOGV(LOGTAG, "media %p is prepared and has %u streams", media, n_streams);
 
     for(i = 0; i < n_streams; i++) {
         GstRTSPStream *stream;
@@ -95,12 +104,11 @@ void RtspServer::MediaPreparedCb(GstRTSPMedia * media) {
             continue;
 
         session = gst_rtsp_stream_get_rtpsession(stream);
-        GST_INFO("watching session %p on stream %u", session, i);
+        //GST_INFO("watching session %p on stream %u", session, i);
+        LOGV(LOGTAG, "Watching session %p on stream %u", session, i);
 
-        g_signal_connect(session, "on-ssrc-active",
-                         (GCallback) OnSsrcActive, media);
-        g_signal_connect(session, "on-sender-ssrc-active",
-                         (GCallback) OnSenderSsrcActive, media);
+        g_signal_connect(session, "on-ssrc-active", (GCallback) OnSsrcActive, media);
+        g_signal_connect(session, "on-sender-ssrc-active", (GCallback) OnSenderSsrcActive, media);
     }
 }
 
@@ -119,8 +127,9 @@ void RtspServer::RtspServerInit(bool setcallback, const gchar *mountpoint, char 
     gst_init(NULL, NULL);
 
     loop = g_main_loop_new(NULL, FALSE);
-
+    gst_debug_set_default_threshold(static_cast<GstDebugLevel>(3));
     server = gst_rtsp_server_new();
+    gst_rtsp_server_set_address(server, "192.168.1.13");
     g_object_set(server, "service", port, NULL);
 
     mounts = gst_rtsp_server_get_mount_points(server);
@@ -130,9 +139,12 @@ void RtspServer::RtspServerInit(bool setcallback, const gchar *mountpoint, char 
     if(setcallback) {
         g_signal_connect(factory, "media-configure", (GCallback)MediaConfigureCb, factory);
     }
-
+    gst_debug_set_threshold_for_name("rtph264pay", static_cast<GstDebugLevel>(3));
     gst_rtsp_mount_points_add_factory(mounts, mountpoint, factory);
+
     g_object_unref(mounts);
+    __android_log_print(ANDROID_LOG_VERBOSE, LOGTAG, "RtspServer::RtspServerInit");
+
 }
 
 void RtspServer::RtspServerAddUser(string user, string password, bool access_perm, bool construct_perm) {
@@ -159,17 +171,20 @@ void RtspServer::RtspServerAddUser(string user, string password, bool access_per
 
 int RtspServer::RtspStart() {
     if(gst_rtsp_server_attach(server, NULL) == 0) {
-        g_print("Unable to attach Server\n");
+        //g_print("Unable to attach Server\n");
+        LOGV(LOGTAG, "Unable to attach Server");
         return -1;
     }
+    __android_log_print(ANDROID_LOG_VERBOSE, LOGTAG, "RtspServer::RtspStart");
 
-    g_unix_signal_add(SIGINT, SignalHandler, loop);
+    //g_unix_signal_add(SIGINT, SignalHandler, loop);
 
     g_main_loop_run(loop);
 }
 
 void RtspServer::RtspStop() {
-    cout << "RtspServer: Stopping" << endl;
+    //cout << "RtspServer: Stopping" << endl;
+    LOGV(LOGTAG, "RtspServer: Stopping");
     PoolCleanup(server);
     RemoveSessions(server);
     g_object_unref(mounts);

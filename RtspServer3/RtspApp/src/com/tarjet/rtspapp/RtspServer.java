@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.freedesktop.gstreamer.GStreamer;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -32,10 +34,18 @@ public class RtspServer extends AppCompatActivity {
         btStopRtspServer = findViewById(R.id.btStopRtspServer);
         tvRtspServerStatus = findViewById(R.id.tvRtspServerStatus);
 
+        try {
+            GStreamer.init(this);
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         btStartRtspServer.setOnClickListener(view -> {
             Toast.makeText(this, "IP Address: " + getIpAddress(), Toast.LENGTH_SHORT).show();
             nativeInit(false, "", "");
-            nativeStart();
+            //nativeStart();
         });
     }
 
